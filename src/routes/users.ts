@@ -18,8 +18,8 @@ user.get("/:id", async (c) => {
   return c.json({ user });
 });
 
-// POST /user
-user.post(
+// PUT /user
+user.put(
   "/",
   zValidator(
     "json",
@@ -31,14 +31,7 @@ user.post(
   ),
   async (c) => {
     const { id, username, email } = c.req.valid("json");
-    
     const user = await db.user.upsert({
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        imageUrl: true,
-      },
       where: {
         auth: id,
       },

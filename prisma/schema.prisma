@@ -47,7 +47,7 @@ model Member {
     id   String     @id @default(uuid())
     role MemberRole @default(GUEST)
 
-    userId   String
+    userId   String    @unique
     user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     messages Message[]
 

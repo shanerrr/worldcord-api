@@ -4,6 +4,8 @@ import { logger } from "hono/logger";
 //routes
 import user from "./routes/users";
 import server from "./routes/servers";
+import member from "./routes/members";
+import channel from "./routes/channels";
 
 const app = new Hono().basePath("/api");
 
@@ -13,6 +15,8 @@ app.use("*", logger());
 //routes
 app.route("/user", user);
 app.route("/server", server);
+app.route("/server", member);
+app.route("/server", channel);
 
 Bun.serve({
   port: process.env.PORT || 4000,
