@@ -1,8 +1,5 @@
 import { Hono } from "hono";
 
-import z from "zod";
-import { zValidator } from "@hono/zod-validator";
-
 import { db } from "../database";
 
 const server = new Hono();
@@ -18,16 +15,6 @@ server.get("/:id", async (c) => {
     },
   });
   return c.json({ server });
-});
-
-// GET /server/:id/channels
-server.get("/:id/channels", async (c) => {
-  const channels = await db.channel.findMany({
-    where: {
-      serverId: c.req.param("id"),
-    },
-  });
-  return c.json({ channels });
 });
 
 export default server;

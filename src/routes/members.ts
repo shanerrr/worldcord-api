@@ -7,6 +7,21 @@ import { db } from "../database";
 
 const member = new Hono();
 
+// GET /server/:serverId/members/:id
+member.get("/:serverId/members/:userId", async (c) => {
+  const { serverId, userId } = c.req.param();
+  const members = await db.member.findMany({
+    where: {
+      userId,
+      serverId,
+    },
+    include: {
+      user: true,
+    },
+  });
+  return c.json({ members });
+});
+
 // GET /server/:id/members
 member.get("/:id/members", async (c) => {
   const members = await db.member.findMany({
