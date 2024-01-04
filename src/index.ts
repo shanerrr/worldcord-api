@@ -32,13 +32,10 @@ app.route("/server", member);
 app.route("/server", channel);
 app.route("/server", message);
 
-Bun.serve({
+export const bunServer = Bun.serve({
   port: process.env.PORT || 4000,
   fetch: (req, server) => {
-    if (server.upgrade(req)) {
-      console.log("help!");
-      return new Response("Hello world");
-    }
+    server.upgrade(req);
     return app.fetch(req, server);
   },
   websocket: {
@@ -46,10 +43,10 @@ Bun.serve({
       console.log(ws.readyState, message);
     }, // a message is received
     open(ws) {
-      console.log("hell9!");
+      ws.subscribe("worldcord");
     }, // a socket is opened
     close(ws, code, message) {
-      console.log("Closed!");
+      ws.unsubscribe("worldcord");
     }, // a socket is closed
     drain(ws) {
       console.log("drained!");

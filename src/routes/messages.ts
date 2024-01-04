@@ -4,16 +4,17 @@ import z from "zod";
 import { zValidator } from "@hono/zod-validator";
 
 import { db } from "../database";
+import { bunServer } from "..";
 
 const message = new Hono();
-
+//TODO: FIX THE ZOD VALIDATOR FOR CURSOR
 // GET /server/:serverId/channels/:id/messages
 message.get(
   "/:serverId/channels/:id/messages",
   zValidator(
     "query",
     z.object({
-      cursor: z.string().optional(),
+      cursor: z.string().transform((e) => (e === "undefined" ? undefined : e)),
       batch: z.string().pipe(z.coerce.number().min(5).max(50)),
     })
   ),
@@ -49,7 +50,10 @@ message.get(
     let nextCursor = null;
     if (messages.length === batch) nextCursor = messages[batch - 1].id;
 
-    return c.json({ messages, cursor: nextCursor });
+    return c.json({
+      messages,
+      cursor: nextCursor,
+    });
   }
 );
 
@@ -67,13 +71,29 @@ message.post(
     const { content, memberId } = c.req.valid("json");
     const { id } = c.req.param();
 
-    await db.message.create({
+    const message = await db.message.create({
       data: {
         memberId,
         content,
         channelId: id,
       },
+      include: {
+        member: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
+
+    bunServer.publish(
+      "worldcord",
+      JSON.stringify({
+        type: "newMessage",
+        queryKey: `channel:${id}`,
+        message,
+      })
+    );
 
     return c.json({ msg: "Success!" });
   }
