@@ -21,7 +21,7 @@ channel.get("/:serverId/channels/:id", async (c) => {
   return c.json({ channel });
 });
 
-// GET /server/:id/channels
+// GET /server/:serverId/channels
 channel.get(
   "/:serverId/channels",
   zValidator(
@@ -32,11 +32,12 @@ channel.get(
   ),
   async (c) => {
     const { filter } = c.req.valid("query");
+    const serverId = c.req.param("serverId");
 
     if (filter === "ALL") {
       const channels = await db.channel.findMany({
         where: {
-          serverId: c.req.param("serverId"),
+          serverId,
         },
       });
 
@@ -44,7 +45,7 @@ channel.get(
     }
     const channel = await db.channel.findFirst({
       where: {
-        serverId: c.req.param("serverId"),
+        serverId,
       },
     });
 

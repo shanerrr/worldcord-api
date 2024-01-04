@@ -10,23 +10,20 @@ const member = new Hono();
 // GET /server/:serverId/members/:id
 member.get("/:serverId/members/:userId", async (c) => {
   const { serverId, userId } = c.req.param();
-  const members = await db.member.findMany({
+  const member = await db.member.findUnique({
     where: {
       userId,
       serverId,
     },
-    include: {
-      user: true,
-    },
   });
-  return c.json({ members });
+  return c.json({ member });
 });
 
-// GET /server/:id/members
-member.get("/:id/members", async (c) => {
+// GET /server/:serverId/members
+member.get("/:serverId/members", async (c) => {
   const members = await db.member.findMany({
     where: {
-      serverId: c.req.param("id"),
+      serverId: c.req.param("serverId"),
     },
     include: {
       user: true,
@@ -35,21 +32,21 @@ member.get("/:id/members", async (c) => {
   return c.json({ members });
 });
 
-// PUT /server/:id/member
+// PUT /server/:serverId/member
 member.put(
-  "/:id/members",
+  "/:serverId/members",
   zValidator(
     "json",
     z.object({
       id: z.string(),
-      serverId: z.string(),
     })
   ),
   async (c) => {
-    const { id, serverId } = c.req.valid("json");
+    const { id } = c.req.valid("json");
+    const serverId = c.req.param("serverId");
 
     await db.member.upsert({
-      where: { userId: id, serverId: serverId },
+      where: { userId: id, serverId },
       create: {
         serverId: serverId,
         userId: id,
