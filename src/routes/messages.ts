@@ -99,4 +99,60 @@ message.post(
   }
 );
 
+// DELETE /server/:serverId/channels/:channelId/messages/:id
+message.delete("/:serverId/channels/:channelId/messages/:id", async (c) => {
+  const { channelId, id } = c.req.param();
+
+  const message = await db.message.delete({
+    where: {
+      id,
+    },
+  });
+
+  bunServer.publish(
+    "worldcord",
+    JSON.stringify({
+      type: "deleteMessage",
+      queryKey: `channel:${channelId}`,
+      message,
+    })
+  );
+
+  return c.json({ msg: "Success!" });
+});
+
+// PATCH /server/:serverId/channels/:channelId/messages/:id
+message.patch(
+  "/:serverId/channels/:channelId/messages/:id",
+  zValidator(
+    "json",
+    z.object({
+      content: z.string(),
+    })
+  ),
+  async (c) => {
+    const { channelId, id } = c.req.param();
+
+    const message = await db.message.update({
+      where: {
+        id,
+      },
+      data: {
+        content: c.req.valid("json").content,
+      },
+    });
+
+    bunServer.publish(
+      "worldcord",
+      JSON.stringify({
+        type: "updateMessage",
+        queryKey: `channel:${channelId}`,
+        message,
+      })
+    );
+
+    return c.json({ msg: "Success!" });
+  }
+);
+
 export default message;
