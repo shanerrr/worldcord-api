@@ -5,10 +5,10 @@ import { zValidator } from "@hono/zod-validator";
 
 import { db } from "../database";
 
-const user = new Hono();
+const users = new Hono();
 
 // GET /user/:id
-user.get("/:id", async (c) => {
+users.get("/:id", async (c) => {
   const id = c.req.param("id");
   const user = await db.user.findUnique({
     where: {
@@ -19,7 +19,7 @@ user.get("/:id", async (c) => {
 });
 
 // PUT /user
-user.put(
+users.put(
   "/",
   zValidator(
     "json",
@@ -48,4 +48,4 @@ user.put(
   }
 );
 
-export default user;
+export default users;

@@ -134,6 +134,11 @@ message.patch(
     const { channelId, id } = c.req.param();
 
     const message = await db.message.update({
+      select: {
+        id: true,
+        content: true,
+        updatedAt: true,
+      },
       where: {
         id,
       },

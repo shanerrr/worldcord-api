@@ -1,18 +1,21 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { poweredBy } from "hono/powered-by";
 
 //routes
-import user from "./routes/users";
+import users from "./routes/users";
 import server from "./routes/servers";
 import member from "./routes/members";
 import channel from "./routes/channels";
 import message from "./routes/messages";
 
-const app = new Hono().basePath("/api");
+export const app = new Hono().basePath("/api");
 
 //middleware
 app.use("*", logger());
+app.use("*", poweredBy());
+
 app.use(
   "*",
   cors({
@@ -26,11 +29,11 @@ app.use(
 );
 
 //routes
-app.route("/user", user);
-app.route("/server", server);
-app.route("/server", member);
-app.route("/server", channel);
-app.route("/server", message);
+app.route("/users", users);
+app.route("/servers", server);
+app.route("/servers", member);
+app.route("/servers", channel);
+app.route("/servers", message);
 
 export const bunServer = Bun.serve({
   port: process.env.PORT || 4000,
