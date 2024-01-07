@@ -68,8 +68,9 @@ message.post(
     })
   ),
   async (c) => {
+    const { serverId, id } = c.req.param();
+
     const { content, memberId } = c.req.valid("json");
-    const { id } = c.req.param();
 
     const message = await db.message.create({
       data: {
@@ -87,7 +88,7 @@ message.post(
     });
 
     bunServer.publish(
-      "worldcord",
+      serverId,
       JSON.stringify({
         type: "newMessage",
         queryKey: `channel:${id}`,
@@ -101,7 +102,7 @@ message.post(
 
 // DELETE /server/:serverId/channels/:channelId/messages/:id
 message.delete("/:serverId/channels/:channelId/messages/:id", async (c) => {
-  const { channelId, id } = c.req.param();
+  const { serverId, channelId, id } = c.req.param();
 
   const message = await db.message.delete({
     where: {
@@ -110,7 +111,7 @@ message.delete("/:serverId/channels/:channelId/messages/:id", async (c) => {
   });
 
   bunServer.publish(
-    "worldcord",
+    serverId,
     JSON.stringify({
       type: "deleteMessage",
       queryKey: `channel:${channelId}`,
@@ -131,7 +132,7 @@ message.patch(
     })
   ),
   async (c) => {
-    const { channelId, id } = c.req.param();
+    const { serverId, channelId, id } = c.req.param();
 
     const message = await db.message.update({
       select: {
@@ -148,7 +149,7 @@ message.patch(
     });
 
     bunServer.publish(
-      "worldcord",
+      serverId,
       JSON.stringify({
         type: "updateMessage",
         queryKey: `channel:${channelId}`,

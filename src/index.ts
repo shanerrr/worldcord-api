@@ -38,7 +38,15 @@ app.route("/servers", message);
 export const bunServer = Bun.serve({
   port: process.env.PORT || 4000,
   fetch: (req, server) => {
-    server.upgrade(req);
+    //conect to websocket if in a valid server
+    if (req.url.includes("/api/websocket")) {
+      const url = new URL(req.url);
+      server.upgrade(req, {
+        data: {
+          serverId: url.searchParams.get("server"),
+        },
+      });
+    }
     return app.fetch(req, server);
   },
   websocket: {
@@ -46,7 +54,7 @@ export const bunServer = Bun.serve({
       console.log(ws.readyState, message);
     }, // a message is received
     open(ws) {
-      ws.subscribe("worldcord");
+      ws.subscribe(ws.data.serverId);
     }, // a socket is opened
     close(ws, code, message) {
       ws.unsubscribe("worldcord");
