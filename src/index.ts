@@ -35,7 +35,7 @@ app.route("/servers", member);
 app.route("/servers", channel);
 app.route("/servers", message);
 
-export const bunServer = Bun.serve({
+export const bunServer = Bun.serve<{ serverId: string }>({
   port: process.env.PORT || 4000,
   fetch: (req, server) => {
     //conect to websocket if in a valid server
