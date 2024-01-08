@@ -16,8 +16,7 @@ model User {
     username String
     admin    Boolean @default(false)
 
-    members  Member[]
-    channels Channel[]
+    members Member[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -64,7 +63,6 @@ model Member {
 enum ChannelType {
     TEXT
     AUDIO
-    VIDEO
 }
 
 model Channel {
@@ -72,8 +70,6 @@ model Channel {
     name String
     type ChannelType @default(TEXT)
 
-    userId   String
-    user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     serverId String
     server   Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
     messages Message[]
@@ -81,7 +77,6 @@ model Channel {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@index([userId])
     @@index([serverId])
 }
 

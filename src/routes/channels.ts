@@ -27,7 +27,6 @@ channel.post(
         serverId,
         name,
         type,
-        userId: "7fc61ef5-d7d6-4997-99a4-d42fc4f5a1e2",
       },
     });
 
@@ -45,6 +44,8 @@ channel.get("/:serverId/channels/:id", async (c) => {
       serverId,
     },
   });
+
+  console.log(id, serverId);
 
   return c.json({ channel });
 });
@@ -67,6 +68,9 @@ channel.get(
         where: {
           serverId,
         },
+        orderBy: {
+          createdAt: "asc",
+        },
       });
 
       return c.json({ channels });
@@ -74,6 +78,10 @@ channel.get(
     const channel = await db.channel.findFirst({
       where: {
         serverId,
+        type: ChannelType.TEXT,
+      },
+      orderBy: {
+        createdAt: "asc",
       },
     });
 

@@ -41,11 +41,15 @@ export const bunServer = Bun.serve<{ serverId: string }>({
     //conect to websocket if in a valid server
     if (req.url.includes("/api/websocket")) {
       const url = new URL(req.url);
-      server.upgrade(req, {
+      const success = server.upgrade(req, {
         data: {
           serverId: url.searchParams.get("server"),
         },
       });
+
+      return success
+        ? undefined
+        : new Response("WebSocket upgrade error", { status: 400 });
     }
     return app.fetch(req, server);
   },
@@ -57,7 +61,7 @@ export const bunServer = Bun.serve<{ serverId: string }>({
       ws.subscribe(ws.data.serverId);
     }, // a socket is opened
     close(ws, code, message) {
-      ws.unsubscribe("worldcord");
+      ws.unsubscribe(ws.data.serverId);
     }, // a socket is closed
     drain(ws) {
       console.log("drained!");
