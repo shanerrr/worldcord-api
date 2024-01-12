@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { poweredBy } from "hono/powered-by";
+import { csrf } from "hono/csrf";
 
 //routes
 import users from "./routes/users";
@@ -18,12 +19,18 @@ app.use("*", poweredBy());
 
 app.use(
   "*",
+  csrf({
+    origin: (origin) => /https:\/\/(\w+\.)?localhost:3000$/.test(origin),
+  })
+);
+app.use(
+  "*",
   cors({
     origin: "http://localhost:3000",
     // allowHeaders: ["X-Custom-Header", "Upgrade-Insecure-Requests"],
-    // allowMethods: ["POST", "GET", "OPTIONS"],
-    exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
-    maxAge: 600,
+    allowMethods: ["POST", "GET", "OPTIONS", "PUT", "PATCH", "DELETE"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 86400,
     credentials: true,
   })
 );
